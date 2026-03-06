@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../supabase';
+import useAutoLogout from '../hooks/useAutoLogout';
 
 const AuthContext = createContext(null);
 
@@ -14,6 +15,8 @@ export const AuthProvider = ({ children }) => {
     if (stored) setUser(JSON.parse(stored));
     fetchUsers();
   }, []);
+
+  
 
   const fetchUsers = async () => {
     const { data } = await supabase.from('users').select('*');
@@ -69,6 +72,9 @@ const login = async (identifier, password) => {
     setUser(null);
     localStorage.removeItem('coal_user');
   };
+  
+  // Auto logout after 15 minutes of inactivity
+  useAutoLogout(logout);
 
   // Update own name
   const updateOwnName = async (newName) => {
